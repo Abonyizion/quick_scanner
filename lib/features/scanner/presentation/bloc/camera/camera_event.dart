@@ -22,25 +22,7 @@ class DisposeCameraEvent extends CameraEvent {}
 
 
 class CaptureFromGalleryEvent extends CameraEvent {
-  final String path;
-  CaptureFromGalleryEvent(this.path);
+  final String imagePath;
+
+  CaptureFromGalleryEvent(this.imagePath);
 }
-
-
-
-
-// Start edge detection
-class StartEdgeDetectionEvent extends CameraEvent {}
-
-/// Stop edge detection
-class StopEdgeDetectionEvent extends CameraEvent {}
-
-/// Update detected edges
-class UpdateDetectedEdgesEvent extends CameraEvent {
-  final List<Offset> edges;
-
-  UpdateDetectedEdgesEvent(this.edges);
-}
-
-// Toggle edge detection on/off
-class ToggleEdgeDetectionEvent extends CameraEvent {}

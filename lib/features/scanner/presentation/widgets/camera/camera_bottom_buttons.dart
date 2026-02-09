@@ -53,6 +53,12 @@ class CameraControls extends StatelessWidget {
                   source: ImageSource.gallery,
                   imageQuality: 90,
                 );
+
+                if (pickedFile != null && context.mounted) {
+                  context.read<CameraBloc>().add(
+                    CaptureFromGalleryEvent(pickedFile.path),
+                  );
+                }
               } catch (e) {
                 debugPrint('Failed to pick image from gallery: $e');
               }
@@ -60,7 +66,7 @@ class CameraControls extends StatelessWidget {
             child: Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.blueGrey,
                 shape: BoxShape.circle,
               ),
@@ -71,6 +77,7 @@ class CameraControls extends StatelessWidget {
               ),
             ),
           ),
+
         ],
       ),
     );

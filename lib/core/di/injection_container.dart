@@ -29,14 +29,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CaptureImage(sl()));
   sl.registerLazySingleton(() => ToggleFlash(sl()));
   sl.registerLazySingleton<ProcessScannedImage>(() => ProcessScannedImage());
-
-  // Repository
-  sl.registerLazySingleton<CameraRepository>(
-        () => CameraRepositoryImpl(sl()),
-  );
-
-  // Data sources
-  sl.registerLazySingleton<CameraLocalDataSource>(
-        () => CameraLocalDataSourceImpl(),
-  );
+  sl.registerLazySingleton<CameraRepository>(() => CameraRepositoryImpl(sl()));
+  sl.registerLazySingleton<CameraLocalDataSource>(() => CameraLocalDataSourceImpl(),);
 }

@@ -32,23 +32,21 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     on<ToggleFlashEvent>(_onToggleFlash);
     on<RetakeImageEvent>(_onRetakeImage);
     on<DisposeCameraEvent>(_onDisposeCamera);
+    on<CaptureFromGalleryEvent>((event, emit) async {
+      emit(CameraCapturing());
 
-    // 🔍 Edge detection
-    on<StartEdgeDetectionEvent>(_onStartEdgeDetection);
-    on<StopEdgeDetectionEvent>(_onStopEdgeDetection);
-    on<ToggleEdgeDetectionEvent>(_onToggleEdgeDetection);
-    on<UpdateDetectedEdgesEvent>(_onUpdateDetectedEdges);
-
+      try {
+        // just pass path straight to preview
+        emit(ImageCaptured(event.imagePath));
+      } catch (e) {
+        emit(CameraError('Failed to load image from gallery'));
+      }
+    });
   }
 
-  // ─────────────────────────────────────────────
   // Camera lifecycle
-  // ─────────────────────────────────────────────
-
-  Future<void> _onInitializeCamera(
-      InitializeCameraEvent event,
-      Emitter<CameraState> emit,
-      ) async {
+  Future<void> _onInitializeCamera(InitializeCameraEvent event,
+      Emitter<CameraState> emit,) async {
     try {
       emit(CameraLoading());
 
@@ -68,10 +66,8 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     }
   }
 
-  Future<void> _onDisposeCamera(
-      DisposeCameraEvent event,
-      Emitter<CameraState> emit,
-      ) async {
+  Future<void> _onDisposeCamera(DisposeCameraEvent event,
+      Emitter<CameraState> emit,) async {
     await _controller?.dispose();
     _controller = null;
   }
@@ -86,10 +82,8 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   // Capture
   // ─────────────────────────────────────────────
 
-  Future<void> _onCaptureImage(
-      CaptureImageEvent event,
-      Emitter<CameraState> emit,
-      ) async {
+  Future<void> _onCaptureImage(CaptureImageEvent event,
+      Emitter<CameraState> emit,) async {
     if (_controller == null) return;
 
     try {
@@ -99,17 +93,14 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
 
       emit(ImageCaptured(
         file.path,
-        _edgeDetectionEnabled ? _lastDetectedEdges : null,
       ));
     } catch (e) {
       emit(CameraError('Failed to capture image: $e'));
     }
   }
 
-  Future<void> _onRetakeImage(
-      RetakeImageEvent event,
-      Emitter<CameraState> emit,
-      ) async {
+  Future<void> _onRetakeImage(RetakeImageEvent event,
+      Emitter<CameraState> emit,) async {
     if (_controller == null) return;
 
     emit(CameraReady(
@@ -122,12 +113,8 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
 
   // ─────────────────────────────────────────────
   // Flash
-  // ─────────────────────────────────────────────
-
-  Future<void> _onToggleFlash(
-      ToggleFlashEvent event,
-      Emitter<CameraState> emit,
-      ) async {
+  Future<void> _onToggleFlash(ToggleFlashEvent event,
+      Emitter<CameraState> emit,) async {
     if (_controller == null || state is! CameraReady) return;
 
     try {
@@ -153,64 +140,5 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     } catch (e) {
       emit(CameraError('Failed to toggle flash: $e'));
     }
-  }
-
-  // ─────────────────────────────────────────────
-  // Edge Detection
-  // ─────────────────────────────────────────────
-
-  void _onStartEdgeDetection(
-      StartEdgeDetectionEvent event,
-      Emitter<CameraState> emit,
-      ) {
-    _edgeDetectionEnabled = true;
-
-    if (state is CameraReady) {
-      emit((state as CameraReady).copyWith(
-        isEdgeDetectionEnabled: true,
-      ));
-    }
-  }
-
-  void _onStopEdgeDetection(
-      StopEdgeDetectionEvent event,
-      Emitter<CameraState> emit,
-      ) {
-    _edgeDetectionEnabled = false;
-    _lastDetectedEdges = null;
-
-    if (state is CameraReady) {
-      emit((state as CameraReady).copyWith(
-        detectedEdges: null,
-        isEdgeDetectionEnabled: false,
-      ));
-    }
-  }
-
-  void _onToggleEdgeDetection(
-      ToggleEdgeDetectionEvent event,
-      Emitter<CameraState> emit,
-      ) {
-    _edgeDetectionEnabled = !_edgeDetectionEnabled;
-
-    if (state is CameraReady) {
-      emit((state as CameraReady).copyWith(
-        isEdgeDetectionEnabled: _edgeDetectionEnabled,
-        detectedEdges: _edgeDetectionEnabled ? _lastDetectedEdges : null,
-      ));
-    }
-  }
-
-  void _onUpdateDetectedEdges(
-      UpdateDetectedEdgesEvent event,
-      Emitter<CameraState> emit,
-      ) {
-    if (!_edgeDetectionEnabled || state is! CameraReady) return;
-
-    _lastDetectedEdges = event.edges;
-
-    emit((state as CameraReady).copyWith(
-      detectedEdges: event.edges,
-    ));
   }
 }

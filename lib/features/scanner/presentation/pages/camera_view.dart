@@ -6,7 +6,7 @@ import '../bloc/camera/camera_event.dart';
 import '../bloc/camera/camera_state.dart';
 import '../bloc/camera/scan_session_bloc.dart';
 import '../widgets/app_snackbar.dart';
-import '../widgets/camera/camera_buttom_buttons.dart';
+import '../widgets/camera/camera_bottom_buttons.dart';
 import '../widgets/camera/camera_focus_mixin.dart';
 import '../widgets/camera/camera_header.dart';
 import '../widgets/camera/camera_loading.dart';
@@ -61,8 +61,7 @@ class _CameraViewState extends State<CameraView> with CameraFocusMixin {
 
           if (state is ImageCaptured) {
             return ImagePreviewWidget(
-              imagePath: state.imagePath,
-              detectedEdges: state.detectedEdges, // Pass edges to preview
+              imagePath: state.imagePath, // Pass edges to preview
               onAddPage: () => _addPageAndContinue(context, state.imagePath),
             );
           }

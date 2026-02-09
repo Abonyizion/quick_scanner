@@ -50,11 +50,11 @@ class CameraCapturing extends CameraState {}
 
 class ImageCaptured extends CameraState {
   final String imagePath;
-  final List<Offset>? detectedEdges;
+
 
   ImageCaptured(
       this.imagePath,
-      this.detectedEdges);
+     );
 
   @override
   List<Object?> get props => [imagePath];
